@@ -4,6 +4,7 @@ import torch
 
 class ContrastiveLoss(nn.Module):
     def __init__(self, alpha, beta, margin=1):
+        super().__init__()
         self.alpha = alpha
         self.beta = beta
         self.margin = margin
