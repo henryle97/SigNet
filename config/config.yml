@@ -1,0 +1,31 @@
+
+device: 'cpu'
+
+data:
+  height: 155
+  width: 220
+  data_dir: "./data/CEDAR"
+
+train:
+  num_epochs: 20
+  learning_rate: 2.5e-5           # lr / sqrt(k) : k = new_batch / old_batch
+  batch_size: 8
+  num_workers: 4
+
+  lr_step: 5
+  lr_scale: 0.1
+  log_interval: 10
+  log: "./train.log"
+
+  eps: 1e-8
+  weight_decay: 5e-4
+  momentum: 0.9
+
+loss:
+  alpha: 1
+  beta: 1
+  margin: 1
+
+seed: 2020
+
+
