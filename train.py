@@ -8,6 +8,7 @@ import torch.optim as optim
 from torchvision import transforms
 from utils.metric import accuracy
 from config.config_utils import get_config
+
 from utils.logger import Logger
 class Trainer():
     def __init__(self, config_path):
@@ -24,19 +25,22 @@ class Trainer():
         alpha = config['loss']['alpha']
         beta = config['loss']['beta']
         margin = config['loss']['margin']
+
         self.num_epochs = config['train']['num_epochs']
-        num_workers = config['data']['num_workers']
-        batch_size = config['data']['batch_size']
+        num_workers = config['train']['num_workers']
+        batch_size = config['train']['batch_size']
         learning_rate = config['train']['learning_rate']
         eps = config['train']['eps']
         weight_decay = config['train']['weight_decay']
         momentum = config['train']['momentum']
         lr_step = config['train']['lr_step']
         lr_scale = config['train']['lr_scale']
-        width = config['data']['width']
-        height = config['data']['height']
         self.log_interval = config['train']['log_interval']
         self.logger = Logger(config['train']['log'])
+
+        width = config['data']['width']
+        height = config['data']['height']
+
 
         torch.manual_seed(seed)
         torch.cuda.manual_seed_all(seed)
