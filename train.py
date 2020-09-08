@@ -30,9 +30,9 @@ class Trainer():
         num_workers = config['train']['num_workers']
         batch_size = config['train']['batch_size']
         learning_rate = config['train']['learning_rate']
-        eps = config['train']['eps']
-        weight_decay = config['train']['weight_decay']
-        momentum = config['train']['momentum']
+        eps = float(config['train']['eps'])
+        weight_decay = float(config['train']['weight_decay'])
+        momentum = float(config['train']['momentum'])
         lr_step = config['train']['lr_step']
         lr_scale = config['train']['lr_scale']
         self.log_interval = config['train']['log_interval']
