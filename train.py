@@ -84,6 +84,7 @@ class Trainer():
             if (batch_idx + 1) % self.log_interval == 0 or batch_idx == len(self.train_loader) - 1:
                 infor = '{}/{}: Loss: {:.4f}'.format(batch_idx + 1, len(self.train_loader), running_loss / number_samples)
                 print(infor)
+                self.logger.log(infor)
                 running_loss = 0
                 number_samples = 0
 
@@ -106,7 +107,9 @@ class Trainer():
                 running_loss += loss.item() * len(x1)
 
                 if (batch_idx + 1) % self.log_interval == 0 or batch_idx == len(self.val_loader) - 1:
-                    print('{}/{}: Loss: {:.4f}'.format(batch_idx + 1, len(self.val_loader), running_loss / number_samples))
+                    infor = 'Valid: {}/{}: Loss: {:.4f}'.format(batch_idx + 1, len(self.val_loader), running_loss / number_samples)
+                    print(infor)
+                    self.logger.log(infor)
 
             distances, y = zip(*distances)
             distances, y = torch.tensor(distances), torch.tensor(y)
@@ -131,7 +134,7 @@ class Trainer():
 
             print('Saving checkpoint..')
             torch.save(to_save, 'checkpoints/epoch_{}_loss_{:.3f}_acc_{:.3f}.pt'.format(epoch, loss, acc))
-
+        self.logger.close()
         print('Done')
 
 
