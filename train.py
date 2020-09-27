@@ -1,4 +1,5 @@
 from model.signet import SigNet
+from model.hnet import SigMobileNet
 from model.loss import ContrastiveLoss
 import os
 from dataset.signet_dataset import get_data_loader
@@ -10,6 +11,8 @@ from utils.metric import accuracy
 from config.config_utils import get_config
 
 from utils.logger import Logger
+
+
 class Trainer():
     def __init__(self, config_path):
         config = get_config(config_path)
@@ -29,29 +32,30 @@ class Trainer():
         self.num_epochs = config['train']['num_epochs']
         num_workers = config['train']['num_workers']
         batch_size = config['train']['batch_size']
-        learning_rate = config['train']['learning_rate']
+        learning_rate = float(config['train']['learning_rate'])
         eps = float(config['train']['eps'])
         weight_decay = float(config['train']['weight_decay'])
         momentum = float(config['train']['momentum'])
         lr_step = config['train']['lr_step']
-        lr_scale = config['train']['lr_scale']
+        lr_scale = float(config['train']['lr_scale'])
         self.log_interval = config['train']['log_interval']
         self.logger = Logger(config['train']['log'])
 
         width = config['data']['width']
         height = config['data']['height']
 
-
         torch.manual_seed(seed)
         torch.cuda.manual_seed_all(seed)
 
-        self.model = SigNet().to(self.device)
+        # self.model = SigNet().to(self.device)
+        self.model = SigMobileNet(128).to(self.device)
         self.criterion = ContrastiveLoss(alpha=alpha, beta=beta, margin=margin).to(self.device)
         self.optimizer = optim.RMSprop(self.model.parameters(), lr=learning_rate, eps=eps, weight_decay=weight_decay,
-                                  momentum=momentum)
+                                       momentum=momentum)
         self.scheduler = optim.lr_scheduler.StepLR(self.optimizer, lr_step, lr_scale)
 
         image_transform = transforms.Compose([
+
             transforms.Resize((height, width)),
             ImageOps.invert,
             transforms.ToTensor(),
@@ -59,11 +63,10 @@ class Trainer():
         ])
 
         self.train_loader = get_data_loader(data_dir=config['data']['data_dir'], is_train=True, batch_size=batch_size,
-                                      image_transform=image_transform, num_workers=num_workers)
+                                            image_transform=image_transform, num_workers=num_workers)
         self.val_loader = get_data_loader(data_dir=config['data']['data_dir'], is_train=False, batch_size=batch_size,
-                                     image_transform=image_transform, num_workers=num_workers)
+                                          image_transform=image_transform, num_workers=num_workers)
         os.makedirs('checkpoints', exist_ok=True)
-
 
     def train(self):
         self.model.train()
@@ -82,7 +85,8 @@ class Trainer():
             number_samples += len(x1)
             running_loss += loss.item() * len(x1)
             if (batch_idx + 1) % self.log_interval == 0 or batch_idx == len(self.train_loader) - 1:
-                infor = '{}/{}: Loss: {:.4f}'.format(batch_idx + 1, len(self.train_loader), running_loss / number_samples)
+                infor = '{}/{}: Loss: {:.4f}'.format(batch_idx + 1, len(self.train_loader),
+                                                     running_loss / number_samples)
                 print(infor)
                 self.logger.log(infor)
                 running_loss = 0
@@ -107,7 +111,8 @@ class Trainer():
                 running_loss += loss.item() * len(x1)
 
                 if (batch_idx + 1) % self.log_interval == 0 or batch_idx == len(self.val_loader) - 1:
-                    infor = 'Valid: {}/{}: Loss: {:.4f}'.format(batch_idx + 1, len(self.val_loader), running_loss / number_samples)
+                    infor = 'Valid: {}/{}: Loss: {:.4f}'.format(batch_idx + 1, len(self.val_loader),
+                                                                running_loss / number_samples)
                     print(infor)
                     self.logger.log(infor)
 
@@ -128,8 +133,8 @@ class Trainer():
 
             to_save = {
                 'model': self.model.state_dict(),
-                'scheduler': self.scheduler.state_dict(),
-                'optim': self.optimizer.state_dict(),
+                #                'scheduler': self.scheduler.state_dict(),
+                #                'optim': self.optimizer.state_dict(),
             }
 
             print('Saving checkpoint..')

@@ -44,6 +44,7 @@ def prepare_CEDAR(M: int, K: int, random_state=0, data_dir='data/CEDAR'):
     num_forged_sign = 24
 
     train_signers, test_signers = train_test_split(signers, test_size=K-M)
+
     pair_genuine_genuine = list(itertools.combinations(range(1, num_genuine_sign+1), 2))
     pair_genuine_forged = list(itertools.product(range(1, num_genuine_sign+1), range(1, num_forged_sign+1)))
 

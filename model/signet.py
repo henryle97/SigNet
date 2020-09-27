@@ -36,6 +36,24 @@ class SigNet(nn.Module):
 
         return output_1, output_2
 
+
+def load_model_from_checkpoint(checkpoint_path):
+    model = SigNet()
+    checkpoint = torch.load(checkpoint_path, map_location=torch.device('cpu'))
+    model.load_state_dict(checkpoint['model'])
+    # torch.save(model.state_dict(), "checkpoint_weight.pth")
+
+    return model
+
+def load_model_from_weight(weight_path):
+    model = SigNet()
+    model.load_state_dict(torch.load(weight_path))
+
+    return model
+
+def count_parameters(model):
+    return sum(p.numel() for p in model.parameters() if p.requires_grad)
+
 if __name__ == "__main__":
     model = SigNet()
     print(model)
@@ -45,6 +63,7 @@ if __name__ == "__main__":
 
     out1, out2 = model(x_1, x_2)
     print(out1.shape)
+    print(count_parameters(model))
 
 
 
